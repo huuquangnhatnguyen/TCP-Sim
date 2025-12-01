@@ -7,7 +7,7 @@ class BurstyLoss:
         self.p_bad = p_bad
         self.avg_good_duration = avg_good_duration
         self.avg_bad_duration = avg_bad_duration
-        self.loss_type = "BURSTY"
+        self.loss_type = "BURSTY_LOSS"
         
     def update_state(self):
         
