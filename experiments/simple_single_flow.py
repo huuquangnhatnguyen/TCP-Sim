@@ -19,8 +19,8 @@ def build_loss_module(loss_type, params):
         return BurstyLoss(
             p_good=params["p_good"],
             p_bad=params["p_bad"],
-            good_duration=params["good_duration"],
-            bad_duration=params["bad_duration"]
+            avg_good_duration=params["good_duration"],
+            avg_bad_duration=params["bad_duration"]
         )
     else:
         raise ValueError(f"Unknown loss type: {loss_type}")
