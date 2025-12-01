@@ -1,16 +1,20 @@
+from venv import logger
 import simpy
+from core.logger import LoggerFactory
 class Link:
     def __init__(self, 
                  env: simpy.Environment, 
                  bandwidth_mbps: float, 
                  prop_delay: float, 
                  queue_size: int,
+                 logger: LoggerFactory,
                  loss_module=None):
         
         self.env = env
         self.bandwidth = bandwidth_mbps
         self.prop_delay = prop_delay
         self.loss_module = loss_module
+        self.logger = logger
         # Initialize the queue with a specified capacity
         self.queue = simpy.Store(env, capacity=queue_size)
         # Start the link process
@@ -19,7 +23,8 @@ class Link:
     def enqueue(self, packet):
         """Attempt to enqueue a packet onto the link. Returns True if successful, False if dropped."""
         if self.loss_module and self.loss_module.should_drop(packet):
-            # Packet is dropped due to loss module
+            # Packet is dropped due to random loss module
+            self.logger.record_event(self.env.now, "random_loss", packet)
             return False  
 
         # Check queue capacity

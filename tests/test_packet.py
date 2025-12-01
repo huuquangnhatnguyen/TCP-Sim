@@ -4,8 +4,13 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from core.packet import Packet
 
+class DummyFlow:
+    def __init__(self, flow_id):
+        self.flow_id = flow_id
+
 def test_packet_init_basic():
-    p = Packet(seq=10, size_bytes=1000, flow_id="flowA")
+    flow = DummyFlow(flow_id="flowA")
+    p = Packet(seq=10, size_bytes=1000, flow=flow)
 
     assert p.seq == 10
     assert p.size_bytes == 1000
@@ -18,7 +23,7 @@ def test_packet_init_basic():
 
 
 def test_packet_repr_data_packet():
-    p = Packet(seq=1, size_bytes=1500, flow_id=1)
+    p = Packet(seq=1, size_bytes=1500, flow=DummyFlow(flow_id=1))
     r = repr(p)
 
     assert "Packet(" in r
@@ -30,7 +35,7 @@ def test_packet_repr_data_packet():
 
 
 def test_packet_ack_fields_and_repr():
-    ack = Packet(seq=5, size_bytes=64, flow_id=2, is_ack=True, ack_for=4)
+    ack = Packet(seq=5, size_bytes=64, flow=DummyFlow(flow_id=2), is_ack=True, ack_for=4)
 
     assert ack.is_ack is True
     assert ack.ack_for == 4
