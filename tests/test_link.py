@@ -4,7 +4,9 @@ import sys
 import pytest
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from core.link import Link
+from core.logger import LoggerFactory
 
+logger = LoggerFactory()
 # Dummy classes for testing
 class DummyFlow:
     def __init__(self, env):
@@ -24,7 +26,7 @@ class DummyLossModule:
 
 def test_link_enqueue_dequeue():
     env = simpy.Environment()
-    link = Link(env, bandwidth_mbps=10, prop_delay=0.1, queue_size=2)
+    link = Link(env, bandwidth_mbps=10, prop_delay=0.1, queue_size=2, logger=logger)
     # Create dummy packets
     flow = DummyFlow(env=env)
     pkt1 = DummyPacket(size_bytes=1000, flow=flow)
@@ -45,7 +47,7 @@ def test_link_with_loss_module():
     env = simpy.Environment()
     # Initialize link with a dummy loss module
     loss_module = DummyLossModule()
-    link = Link(env, bandwidth_mbps=10, prop_delay=0.1, queue_size=5, loss_module=loss_module)
+    link = Link(env, bandwidth_mbps=10, prop_delay=0.1, queue_size=5, loss_module=loss_module, logger=logger)
     flow = DummyFlow(env=env)
     pkt1 = DummyPacket(size_bytes=1000, flow=flow)  # Should not be dropped
     pkt2 = DummyPacket(size_bytes=2000, flow=flow)  # Should be dropped
@@ -58,7 +60,7 @@ def test_link_with_loss_module():
 
 def test_link_transmission_time():
     env = simpy.Environment()
-    link = Link(env, bandwidth_mbps=10, prop_delay=0.1, queue_size=5)
+    link = Link(env, bandwidth_mbps=10, prop_delay=0.1, queue_size=5, logger=logger)
     flow = DummyFlow(env=env)
     pkt = DummyPacket(size_bytes=1000, flow=flow)  # 1000 bytes
     start_time = env.now
