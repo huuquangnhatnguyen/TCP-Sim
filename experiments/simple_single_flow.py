@@ -6,7 +6,7 @@ from core.env import SimulationEnvironment
 from core.link import Link
 from tcp.reno import RenoFlow as TCPSenderReno
 from core.logger import LoggerFactory
-
+import random
 from loss.random import RandomLoss
 from loss.bursty import BurstyLoss
 
@@ -57,12 +57,14 @@ def simple_single_flow_experiment(config):
     flow = TCPSenderReno(
         env,
         link,
-        flow_id=1,
-        logger=logger
+        flow_id=random.randint(1, 1000),
+        logger=logger,
+        num_packets=config["num_packets"]
     )
 
-    # Run the simulation for a specified duration
-    sim_env.run(until=config["sim_duration"])
+    estimated_total_time = (config["num_packets"] * 1500 * 8) / (bandwidth_mbps * 1e6) + prop_delay * 2 + 20000
+    # Run the simulation for a specified number of packets
+    sim_env.run(until=estimated_total_time)  # Run for the estimated total time
 
     # After simulation, we can analyze logs or print summary statistics
     logger.write_all_logs()
@@ -73,12 +75,12 @@ if __name__ == "__main__":
     config = {
         "bandwidth_mbps" : 10,      # Link bandwidth in Mbps
         "prop_delay" : 0.05,        # Propagation delay in seconds
-        "queue_size" : 20  ,        # Queue size in packets
-        "loss_type" : "random",     # Type of loss module: "none", "random", "bursty"
+        "queue_size" : 10  ,        # Queue size in packets
+        "loss_type" : "none",     # Type of loss module: "none", "random", "bursty"
         "loss_params" : {
-            "drop_prob": 0.01     # For random loss
+            "drop_prob": 0.3     # For random loss
         },
-        "sim_duration" : 10        # Simulation duration in seconds
+        "num_packets" : 10000        # Number of packets to send
     }
 
     simple_single_flow_experiment(config)

@@ -32,6 +32,7 @@ class Link:
             yield self.queue.put(packet)
             return True  # Packet successfully enqueued
         else:
+            self.logger.record_event(self.env.now, "CONGESTION_LOSS", packet)
             return False  # Packet is dropped due to full queue
 
     def run(self):

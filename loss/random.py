@@ -8,7 +8,7 @@ def maybe_drop_random(self, pkt, p):
 class RandomLoss:
     def __init__(self, drop_prob: float):
         self.drop_prob = drop_prob
-        self.loss_type = "RANDOM"
+        self.loss_type = "RANDOM_LOSS"
 
     def should_drop(self, packet):
         return maybe_drop_random(self, packet, self.drop_prob)

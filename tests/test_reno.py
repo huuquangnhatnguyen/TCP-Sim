@@ -2,10 +2,13 @@ from tcp.reno import RenoFlow
 import pytest
 import simpy
 from core.link import Link  # Assuming Link is needed for RenoFlow initialization
+from core.logger import LoggerFactory  # Assuming a logger is needed
+
+logger = LoggerFactory()  
 
 def test_reno_flow_initialization():
     env = simpy.Environment()
-    link = Link(env, bandwidth_mbps=10, prop_delay=0.1, queue_size=5, logger=None)  # Dummy link for initialization
+    link = Link(env, bandwidth_mbps=10, prop_delay=0.1, queue_size=5, logger=logger)  # Dummy link for initialization
     reno_flow = RenoFlow(env, link, flow_id=1)
 
     assert reno_flow.cwnd == 1
@@ -15,7 +18,7 @@ def test_reno_flow_initialization():
     assert reno_flow.unacked == {}
 def test_reno_flow_sending_packets():
     env = simpy.Environment()
-    link = Link(env, bandwidth_mbps=10, prop_delay=0.1, queue_size=5, logger=None)
+    link = Link(env, bandwidth_mbps=10, prop_delay=0.1, queue_size=5, logger=logger)
     reno_flow = RenoFlow(env, link, flow_id=1)
 
     def run_sender():
@@ -26,7 +29,7 @@ def test_reno_flow_sending_packets():
     env.run(until=0.02)
 def test_reno_flow_timeout_handling():
     env = simpy.Environment()
-    link = Link(env, bandwidth_mbps=10, prop_delay=0.1, queue_size=5, logger=None)
+    link = Link(env, bandwidth_mbps=10, prop_delay=0.1, queue_size=5, logger=logger)
     reno_flow = RenoFlow(env, link, flow_id=1)
 
     def run_timer():
