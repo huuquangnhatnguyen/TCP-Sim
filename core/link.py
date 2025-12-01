@@ -24,7 +24,7 @@ class Link:
         """Attempt to enqueue a packet onto the link. Returns True if successful, False if dropped."""
         if self.loss_module and self.loss_module.should_drop(packet):
             # Packet is dropped due to random loss module
-            self.logger.record_event(self.env.now, "random_loss", packet)
+            self.logger.record_event(self.env.now, self.loss_module.loss_type, packet)
             return False  
 
         # Check queue capacity
