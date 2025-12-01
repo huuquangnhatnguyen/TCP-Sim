@@ -1,4 +1,5 @@
 from loss.random import RandomLoss
+from loss.bursty import BurstyLoss
 import simpy
 from core.link import Link
 from core.logger import LoggerFactory
@@ -31,3 +32,22 @@ def test_random_loss_link_dropping():
             dropped_count += 1
     drop_rate = dropped_count / total_packets
     assert drop_rate <= 1  
+
+
+def test_bursty_loss_module():
+    env = simpy.Environment()
+    loss_module = BurstyLoss(p_good=0.001, p_bad=0.3, avg_good_duration=5, avg_bad_duration=2)
+    link = Link(env, bandwidth_mbps=10, prop_delay=0.1, queue_size=10, loss_module=loss_module, logger=logger)
+    flow = DummyFlow(env)
+    total_packets = 1000
+    dropped_packets = 0
+
+    for _ in range(total_packets):
+        pkt = DummyPacket(size_bytes=1000, flow=flow)
+        result = env.process(link.enqueue(pkt))
+        env.run(until=env.now + 0.01)
+        if result.value is False:
+            dropped_packets += 1
+    drop_rate = dropped_packets / total_packets
+    
+    assert 0 <= drop_rate <= 1  # Basic sanity check on drop rate

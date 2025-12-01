@@ -21,6 +21,8 @@ class DummyPacket:
         self.flow = flow
 # Dummy loss module that drops packets larger than a threshold
 class DummyLossModule:
+    def __init__(self):
+        self.loss_type = "DUMMY"
     def should_drop(self, packet):
         return packet.size_bytes > 1500
 
