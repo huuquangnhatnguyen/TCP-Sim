@@ -19,8 +19,10 @@ class Link:
     def enqueue(self, packet):
         """Attempt to enqueue a packet onto the link. Returns True if successful, False if dropped."""
         if self.loss_module and self.loss_module.should_drop(packet):
-            return False  # Packet is dropped due to loss module
+            # Packet is dropped due to loss module
+            return False  
 
+        # Check queue capacity
         if len(self.queue.items) < self.queue.capacity:
             yield self.queue.put(packet)
             return True  # Packet successfully enqueued
