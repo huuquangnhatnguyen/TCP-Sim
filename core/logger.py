@@ -25,6 +25,7 @@ class LoggerFactory:
         self.cwnd_logger.append(
             {
                 "time": time,
+                "event_type": "CWND_UPDATE",
                 "flow_id": flow_id,
                 "cwnd": cwnd
             }
@@ -55,6 +56,7 @@ class LoggerFactory:
         self.packet_sent_logger.append(
             {
                 "time": time,
+                "event_type": "PACKET_SENT",
                 "flow_id": flow_id,
                 "seq": seq
             }
@@ -65,14 +67,15 @@ class LoggerFactory:
         self.ack_logger.append(
             {
                 "time": time,
+                "event_type": "ACK_RECEIVED",
                 "flow_id": flow_id,
                 "ack_seq": ack_seq
             }
         )
         self.logger.debug(f"Recorded ACK: time={time}, flow_id={flow_id}, ack_seq={ack_seq}")
 
-    def _write_csv(self, data: list, filename: str, fieldnames: list):
-        log_path = pathlib.Path("logs")
+    def _write_csv(self, data: list, folder: str, filename: str, fieldnames: list):
+        log_path = pathlib.Path(folder)
         with open(log_path / filename, mode='w', newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
@@ -80,9 +83,11 @@ class LoggerFactory:
                 writer.writerow(row)
         self.logger.info(f"Wrote log to {filename}")
 
-    def write_all_logs(self):
-        self._write_csv(self.cwnd_logger, "cwnd_log.csv", ["time", "flow_id", "cwnd"])
-        self._write_csv(self.queue_logger, "queue_log.csv", ["time", "link_id", "queue_size"])
-        self._write_csv(self.event_logger, "event_log.csv", ["time", "event_type", "details"])
-        self._write_csv(self.packet_sent_logger, "packet_sent_log.csv", ["time", "flow_id", "seq"])
-        self._write_csv(self.ack_logger, "ack_log.csv", ["time", "flow_id", "ack_seq"])
+    def write_all_logs(self, folder: str = "logs"):
+        log_path = pathlib.Path(folder)
+        log_path.mkdir(parents=True, exist_ok=True)
+        self._write_csv(self.cwnd_logger, folder, "cwnd_log.csv", ["time", "event_type" ,"flow_id", "cwnd"])
+        self._write_csv(self.queue_logger, folder, "queue_log.csv", ["time", "link_id", "queue_size"])
+        self._write_csv(self.event_logger, folder, "event_log.csv", ["time", "event_type", "details"])
+        self._write_csv(self.packet_sent_logger, folder, "packet_sent_log.csv", ["time", "event_type", "flow_id", "seq"])
+        self._write_csv(self.ack_logger, folder, "ack_log.csv", ["time", "event_type", "flow_id", "ack_seq"])
