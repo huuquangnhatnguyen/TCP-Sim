@@ -4,7 +4,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from core.env import SimulationEnvironment
 from core.link import Link
-from tcp.reno import RenoFlow as TCPSenderReno
+from tcp.cubic import CubicFlow as TCPSenderCubic
 from core.logger import LoggerFactory
 import random
 from loss.random import RandomLoss
@@ -25,7 +25,7 @@ def build_loss_module(loss_type, params):
     else:
         raise ValueError(f"Unknown loss type: {loss_type}")
 
-def simple_single_flow_experiment(config):
+def simple_single_flow_experiment_Cubic(config):
     """
     A simple experiment that sets up a single TCP flow over a link with
     specified parameters, runs the simulation, and collects basic statistics.
@@ -53,7 +53,7 @@ def simple_single_flow_experiment(config):
     )
 
     # Create a single TCP Reno sender
-    flow = TCPSenderReno(
+    flow = TCPSenderCubic(
         env,
         link,
         flow_id=random.randint(1, 1000),
@@ -85,5 +85,5 @@ if __name__ == "__main__":
         "num_packets" : 10000        # Number of packets to send
     }
 
-    simple_single_flow_experiment(config)
+    simple_single_flow_experiment_Cubic(config)
     print("Done.")
